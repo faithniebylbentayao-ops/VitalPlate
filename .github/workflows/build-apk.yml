@@ -36,7 +36,7 @@ jobs:
           elif [ -f package-lock.json ]; then
             npm ci
           else
-            npm install
+            npm install --legacy-peer-deps
           fi
           bun run build || npm run build
 
@@ -46,7 +46,11 @@ jobs:
           if [ ! -d "$WEB_DIR" ] && [ -d "build" ]; then
             WEB_DIR="build"
           fi
-          npm install --no-save @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          if [ -f bun.lock ] || [ -f bun.lockb ]; then
+            bun add --no-save @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          else
+            npm install --no-save --legacy-peer-deps @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          fi
           npx cap init VitalPlate com.vitalplate.app --web-dir="$WEB_DIR"
           npx cap add android
           npx cap sync android
