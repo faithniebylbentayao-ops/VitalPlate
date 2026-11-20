@@ -1,0 +1,6 @@
+{
+  "name": "VitalPlate",
+  "description": "Smart personalized food recommendation mobile app calculating energy and macro targets and generating tailored meals for weight loss, healthy weight gain, and balanced maintenance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
