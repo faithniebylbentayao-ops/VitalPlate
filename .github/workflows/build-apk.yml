@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -47,9 +47,9 @@ jobs:
             WEB_DIR="build"
           fi
           if [ -f bun.lock ] || [ -f bun.lockb ]; then
-            bun add --no-save @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+            bun add @capacitor/core @capacitor/cli @capacitor/android
           else
-            npm install --no-save --legacy-peer-deps @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+            npm install --no-save --legacy-peer-deps @capacitor/core @capacitor/cli @capacitor/android
           fi
           npx cap init VitalPlate com.vitalplate.app --web-dir="$WEB_DIR"
           npx cap add android
