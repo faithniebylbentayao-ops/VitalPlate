@@ -1,0 +1,65 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Java & Android SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies & build web app
+        run: |
+          if [ -f bun.lock ] || [ -f bun.lockb ]; then
+            bun install
+          elif [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          bun run build || npm run build
+
+      - name: Setup Capacitor Android
+        run: |
+          WEB_DIR="dist"
+          if [ ! -d "$WEB_DIR" ] && [ -d "build" ]; then
+            WEB_DIR="build"
+          fi
+          npm install --no-save @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          npx cap init VitalPlate com.vitalplate.app --web-dir="$WEB_DIR"
+          npx cap add android
+          npx cap sync android
+
+      - name: Assemble Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VitalPlate-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
